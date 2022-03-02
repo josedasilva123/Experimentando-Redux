@@ -1,0 +1,19 @@
+<head>
+    <title>Redux</title>
+    <script src="/js/redux.min.js"></script>
+    <script src="/js/immer.min.js"></script>    
+</head>
+
+<body>
+    <div id="caixa" style="background: blue; height: 50px; width: 10px"></div>
+    <script type="module">
+        import store from './js/configureStore.js';
+        import {incrementar} from './js/contador.js'
+        store.subscribe(() => {
+            const state = store.getState();
+            console.log('Funcionou');
+            console.log(state);
+        })
+        store.dispatch(incrementar());
+    </script>
+</body>

@@ -1,0 +1,50 @@
+<head>
+    <title>Redux</title>
+    <script src="/js/redux.min.js"></script>
+    <script src="/js/immer.min.js"></script>    
+</head>
+
+<body>
+    <div id="caixa" style="background: blue; height: 50px; width: 10px"></div>
+    <script>
+        const obj1 = {
+            nome: 'Alex',
+            idade: 31,
+        }
+        const obj2 = immer.produce(obj1, (draft) => {
+            draft.idade = 32;
+        })
+        console.log(obj1);
+        console.log(obj2);
+        const initialState = {
+            nome: 'Alex',
+            idade: 31,
+        }
+
+        const reducer = immer.produce((state, action) => {
+            switch(action.type){
+                case 'MUDAR_NOME':
+                    return {...state, nome: action.payload}
+                    break;
+                case 'MUDAR_IDADE':
+                    return {...state, idade: action.payload}
+                    break;     
+                 
+            }
+        }, initialState);
+
+        const store = Redux.createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+        function render(){
+            store.subscribe(() => {
+                const state = store.getState();
+                console.log(state);                
+            })
+        }
+        render();
+        /* Altera o estado */
+        store.dispatch({type: 'MUDAR_NOME', payload: 'José'})
+        store.dispatch({type: 'MUDAR_IDADE', payload: 32})
+
+    </script>
+</body>
