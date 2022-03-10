@@ -1,6 +1,14 @@
+function getLocalStorage(key, initial){
+    try {
+        return (window.localStorage.getItem(key))
+    } catch (err) {
+        return initial;
+    }
+}
+
 const initialState = {
     loading: false,
-    data: null,
+    data: getLocalStorage('key', null),
     error: null,
 }
 
@@ -24,11 +32,18 @@ const thunk =  (store) => (next) => (action) => {
     return next(action);
 }
 
+const localStorage = (store) => (next) => (action) => {
+    if(action.localStorage !== undefined){
+        window.localStorage.setItem(action.localStorage, JSON.stringify(action.payload));
+    }
+    return next(action);
+}
+
 const {applyMiddleware, compose} = Redux;
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const enhancer = composeEnhancers(applyMiddleware(thunk));
+const enhancer = composeEnhancers(applyMiddleware(thunk, localStorage));
 
 const store = Redux.createStore(reducer, enhancer);
 
@@ -38,16 +53,20 @@ function fetchUrl(url){
             dispatch({ type: 'FETCH_STARTED'});
             const data = await fetch(url);
             const json = await data.json();
-            dispatch({ type: 'FETCH_SUCESS', payload: json })
+            dispatch({ type: 'FETCH_SUCESS', payload: json, localStorage: 'key' })
         } catch (err) {
             dispatch({ type: 'FETCH_ERROR', payload: err.message })
         }
     }
 }
-store.dispatch(
-    fetchUrl('https://pokeapi.co/api/v2/pokemon/ditto'),
-);
-
+const state = store.getState();
+if (state.data === null){
+    store.dispatch(
+        fetchUrl('https://pokeapi.co/api/v2/pokemon/ditto'),
+    );
+    
+}
+console.log(state);
 /*
 const logger = (store) => (next) => (action) => {
     console.group(action.type);
